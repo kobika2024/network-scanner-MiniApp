@@ -176,14 +176,21 @@ network-scanner/
 3. **בדיקת פורט 52311** (ברירת המחדל של BigFix Client) — כגיבוי, כאשר אין
    הרשאות מספיקות לשאילתת ה-WMI.
 
+בהרצה, הסקריפט פותח אוטומטית **חלון גרפי** להזנת שם משתמש וסיסמה (אלא אם
+מוסיפים `-NoCredentialPrompt`), ומשתמש בהם לביצוע שאילתת ה-WMI מול היעדים.
+
 **שימוש:**
 
 ```powershell
 # קובץ servers.txt מכיל IP או hostname אחד בכל שורה
+# יופיע חלון להזנת שם משתמש וסיסמה
 .\scripts\Test-BigFixClient.ps1 -InputFile .\servers.txt
 
-# עם קרדנצ'יאלס מפורשים ונתיב לדוח פלט
-.\scripts\Test-BigFixClient.ps1 -InputFile .\servers.txt -OutputFile .\report.csv -Credential (Get-Credential)
+# עם נתיב מותאם לדוח פלט
+.\scripts\Test-BigFixClient.ps1 -InputFile .\servers.txt -OutputFile .\report.csv
+
+# ללא בקשת קרדנצ'יאלס - הרצה תחת המשתמש הנוכחי בלבד
+.\scripts\Test-BigFixClient.ps1 -InputFile .\servers.txt -NoCredentialPrompt
 ```
 
 הסקריפט מדפיס טבלת סיכום למסך ומייצא דוח מפורט ל-CSV (עמודות: `Target`,

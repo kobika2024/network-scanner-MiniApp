@@ -28,8 +28,13 @@
     the current directory.
 
 .PARAMETER Credential
-    Optional credential used for the remote WMI/CIM service query. If
-    omitted, the current user's credentials are used.
+    Credential used for the remote WMI/CIM service query. If omitted, and
+    -NoCredentialPrompt is not specified, a graphical username/password
+    window pops up at the start of the script to collect it.
+
+.PARAMETER NoCredentialPrompt
+    Skip the graphical credential prompt and run the WMI/CIM query under
+    the current user's context (or with -Credential, if supplied).
 
 .PARAMETER TimeoutSeconds
     Timeout, in seconds, applied to the ping check, the CIM query and the
@@ -39,7 +44,7 @@
     .\Test-BigFixClient.ps1 -InputFile .\servers.txt
 
 .EXAMPLE
-    .\Test-BigFixClient.ps1 -InputFile .\servers.txt -OutputFile .\report.csv -Credential (Get-Credential)
+    .\Test-BigFixClient.ps1 -InputFile .\servers.txt -OutputFile .\report.csv -NoCredentialPrompt
 #>
 
 [CmdletBinding()]
@@ -52,12 +57,21 @@ param(
 
     [System.Management.Automation.PSCredential]$Credential,
 
+    [switch]$NoCredentialPrompt,
+
     [ValidateRange(1, 60)]
     [int]$TimeoutSeconds = 3
 )
 
 $BigFixServiceName = 'BESClient'
 $BigFixClientPort = 52311
+
+if (-not $Credential -and -not $NoCredentialPrompt) {
+    $Credential = Get-Credential -Message 'הזן שם משתמש וסיסמה לביצוע בדיקת BigFix Client מרוחקת (WMI)' -Title 'BigFix Client Scanner'
+    if (-not $Credential) {
+        Write-Warning 'לא סופקו פרטי התחברות - הסריקה תמשיך תחת המשתמש הנוכחי.'
+    }
+}
 
 function Test-BigFixPort {
     param([string]$ComputerName, [int]$Port, [int]$TimeoutSec)
