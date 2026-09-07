@@ -67,8 +67,16 @@ $BigFixServiceName = 'BESClient'
 $BigFixClientPort = 52311
 
 if (-not $Credential -and -not $NoCredentialPrompt) {
+    $consolePromptingKey = 'HKCU:\Software\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell'
+    $consolePromptingValue = (Get-ItemProperty -Path $consolePromptingKey -Name ConsolePrompting -ErrorAction SilentlyContinue).ConsolePrompting
+    Write-Host "[DEBUG] About to call Get-Credential. ConsolePrompting registry value: $consolePromptingValue" -ForegroundColor DarkGray
+
     $Credential = Get-Credential -Message 'Enter credentials for the remote BigFix Client (WMI) check' -Title 'BigFix Client Scanner'
-    if (-not $Credential) {
+
+    if ($Credential) {
+        Write-Host "[DEBUG] Credential captured for user: $($Credential.UserName)" -ForegroundColor DarkGray
+    }
+    else {
         Write-Warning 'No credentials supplied - continuing under the current user context.'
     }
 }
