@@ -153,8 +153,45 @@ network-scanner/
 ├── network_scanner.spec   ← הגדרת PyInstaller
 ├── build.bat              ← סקריפט בנייה מלא
 ├── app.manifest           ← UAC + DPI awareness (Windows)
-└── requirements.txt
+├── requirements.txt
+│
+└── scripts/
+    ├── Test-BigFixClient.ps1  ← סקריפט PowerShell: סריקת BigFix Client
+    └── servers.sample.txt     ← דוגמה לקובץ רשימת יעדים
 ```
+
+---
+
+## כלי PowerShell נלווים
+
+### `scripts/Test-BigFixClient.ps1`
+
+סקריפט עצמאי (לא תלוי באפליקציית ה-Python) שבודק, עבור רשימת כתובות IP /
+שמות שרתים בקובץ TXT, האם מותקן עליהם **BigFix Client** (BES Client).
+
+**שיטת הבדיקה:**
+1. **Ping** — בדיקת זמינות בסיסית.
+2. **שאילתת שירות מרחוק (WMI/CIM)** — בודק אם קיים שירות בשם `BESClient`
+   על המחשב המרוחק (הבדיקה האמינה ביותר; דורשת הרשאות Admin על היעד).
+3. **בדיקת פורט 52311** (ברירת המחדל של BigFix Client) — כגיבוי, כאשר אין
+   הרשאות מספיקות לשאילתת ה-WMI.
+
+**שימוש:**
+
+```powershell
+# קובץ servers.txt מכיל IP או hostname אחד בכל שורה
+.\scripts\Test-BigFixClient.ps1 -InputFile .\servers.txt
+
+# עם קרדנצ'יאלס מפורשים ונתיב לדוח פלט
+.\scripts\Test-BigFixClient.ps1 -InputFile .\servers.txt -OutputFile .\report.csv -Credential (Get-Credential)
+```
+
+הסקריפט מדפיס טבלת סיכום למסך ומייצא דוח מפורט ל-CSV (עמודות: `Target`,
+`Reachable`, `BigFixInstalled`, `ServiceState`, `StartMode`, `CheckMethod`,
+`Error`).
+
+> יש להריץ מתוך Windows PowerShell / PowerShell עם גישת רשת ליעדים
+> (ותלוי-בדיקה — הרשאות Administrator ליעדים לביצוע שאילתת WMI מלאה).
 
 ---
 
