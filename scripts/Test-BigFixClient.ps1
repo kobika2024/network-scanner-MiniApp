@@ -67,9 +67,9 @@ $BigFixServiceName = 'BESClient'
 $BigFixClientPort = 52311
 
 if (-not $Credential -and -not $NoCredentialPrompt) {
-    $Credential = Get-Credential -Message 'הזן שם משתמש וסיסמה לביצוע בדיקת BigFix Client מרוחקת (WMI)' -Title 'BigFix Client Scanner'
+    $Credential = Get-Credential -Message 'Enter credentials for the remote BigFix Client (WMI) check' -Title 'BigFix Client Scanner'
     if (-not $Credential) {
-        Write-Warning 'לא סופקו פרטי התחברות - הסריקה תמשיך תחת המשתמש הנוכחי.'
+        Write-Warning 'No credentials supplied - continuing under the current user context.'
     }
 }
 
